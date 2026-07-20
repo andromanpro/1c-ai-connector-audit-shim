@@ -1,0 +1,22 @@
+[Unit]
+Description=ИИкона — Audit Shim (D3): REST-мост 1С <-> rlm-tools-bsl
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# Каталог, куда развёрнут шим (shim.py + .venv). Правь под свою установку.
+WorkingDirectory=/opt/iikona-audit-shim
+Environment=AUDIT_RLM_URL=http://127.0.0.1:9000/mcp
+Environment=AUDIT_SRC=/opt/iikona-audit-shim/xml-dump
+Environment=AUDIT_HOST=127.0.0.1
+Environment=AUDIT_PORT=9001
+ExecStart=/opt/iikona-audit-shim/.venv/bin/python shim.py
+Restart=always
+RestartSec=5
+# Пользователь службы (создай или подставь свой):
+User=iikona
+Group=iikona
+
+[Install]
+WantedBy=multi-user.target

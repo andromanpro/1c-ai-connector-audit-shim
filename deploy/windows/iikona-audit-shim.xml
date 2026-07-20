@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Конфиг WinSW для службы шима. Ставится install-скриптом рядом с iikona-audit-shim.exe
+  (переименованный WinSW) в корне каталога шима. %BASE% = каталог exe = корень шима,
+  поэтому конфиг переносим: .venv, shim.py, xml-dump резолвятся относительно него.
+  Правь блок <env> под свою установку.
+-->
+<service>
+  <id>iikona-audit-shim</id>
+  <name>ИИкона — Audit Shim (D3)</name>
+  <description>REST-мост 1С &lt;-&gt; rlm-tools-bsl: по {модуль, строка} отдаёт метод, тело и граф вызовов. Аудитор кода D3.</description>
+
+  <!-- Интерпретатор из собственного .venv шима — напрямую, без uv/PATH,
+       чтобы служба не зависела от профиля и окружения аккаунта. -->
+  <executable>%BASE%\.venv\Scripts\python.exe</executable>
+  <arguments>shim.py</arguments>
+  <workingdirectory>%BASE%</workingdirectory>
+
+  <env name="AUDIT_RLM_URL" value="http://127.0.0.1:9000/mcp"/>
+  <env name="AUDIT_SRC" value="%BASE%\xml-dump"/>
+  <env name="AUDIT_HOST" value="127.0.0.1"/>
+  <env name="AUDIT_PORT" value="9001"/>
+
+  <startmode>Automatic</startmode>
+  <onfailure action="restart" delay="10 sec"/>
+  <log mode="roll-by-size">
+    <sizeThreshold>10240</sizeThreshold>
+    <keepFiles>5</keepFiles>
+  </log>
+</service>

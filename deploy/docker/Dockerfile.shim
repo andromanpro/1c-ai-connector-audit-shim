@@ -1,0 +1,22 @@
+# Шим-контейнер: тонкий REST-мост 1С <-> rlm. Оптимален на Linux-хосте (см. DEPLOY.md).
+FROM python:3.12-slim
+
+RUN useradd -m shim
+WORKDIR /app
+
+# Зависимости шима, декуплены от rlm-венва: starlette + uvicorn + mcp-клиент.
+RUN pip install --no-cache-dir "starlette>=0.37" "uvicorn>=0.30" "mcp>=1.2.0"
+
+COPY shim.py /app/shim.py
+USER shim
+
+ENV AUDIT_RLM_URL=http://rlm:9000/mcp \
+    AUDIT_HOST=0.0.0.0 \
+    AUDIT_PORT=9001
+# AUDIT_SRC задаётся в docker-compose.yml (контейнерный путь дампа).
+
+EXPOSE 9001
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+  CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:9001/health')"
+
+CMD ["python", "shim.py"]

@@ -1,0 +1,14 @@
+[project]
+name = "iikona-audit-shim"
+version = "0.1.0"
+description = "REST-шим между 1С и rlm-tools-bsl — аудитор кода D3 (ИИкона)"
+requires-python = ">=3.10"
+dependencies = [
+    "starlette>=0.37",
+    "uvicorn>=0.30",
+    "mcp>=1.2.0",
+]
+
+[tool.uv]
+# Это приложение, не библиотека — uv sync создаёт .venv рядом, ничего не собирает.
+package = false

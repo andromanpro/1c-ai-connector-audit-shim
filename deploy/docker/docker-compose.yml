@@ -1,0 +1,42 @@
+# ИИкона — аудитор кода D3: движок rlm-tools-bsl (upstream) + наш шим, одним compose.
+# Оптимально на Linux-хосте (нативный Docker). На Windows — вариант A (служба), см. DEPLOY.md:
+# Docker Desktop гоняет I/O через WSL2/Virtiofs, индексация тормозит в 5-10x.
+services:
+  rlm:
+    # Движок из клона upstream: git clone https://github.com/Dach-Coin/rlm-tools-bsl
+    build:
+      context: ${RLM_REPO:?Set RLM_REPO to a cloned rlm-tools-bsl repo (see .env.example)}
+    ports:
+      - "${RLM_PORT:-9000}:9000"
+    volumes:
+      # XML-дамп конфигурации 1С — read-only. Тот же путь шим шлёт в AUDIT_SRC.
+      - "${AUDIT_DUMP:?Set AUDIT_DUMP to your 1C XML dump dir}:/repos/iikona:ro"
+      - rlm-config:/home/rlm/.config/rlm-tools-bsl
+      - rlm-index-cache:/home/rlm/.cache/rlm-tools-bsl
+    environment:
+      - RLM_TRANSPORT=streamable-http
+      - RLM_HOST=0.0.0.0
+      - RLM_PORT=9000
+      # Пересчёт индексов зарегистрированных проектов при старте (дорого — по желанию):
+      # - RLM_UPDATE_INDEX_ON_START=1
+    restart: unless-stopped
+
+  shim:
+    build:
+      context: ../..
+      dockerfile: deploy/docker/Dockerfile.shim
+    ports:
+      - "${AUDIT_PORT:-9001}:9001"
+    environment:
+      - AUDIT_RLM_URL=http://rlm:9000/mcp
+      - AUDIT_SRC=/repos/iikona          # контейнерный путь дампа (как смонтирован в rlm)
+      - AUDIT_HOST=0.0.0.0
+      - AUDIT_PORT=9001
+    depends_on:
+      rlm:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  rlm-config:
+  rlm-index-cache:
