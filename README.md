@@ -51,6 +51,16 @@ curl -X POST http://127.0.0.1:9001/audit -H "Content-Type: application/json" \
 адреса серверов 1С. Настройка со стороны 1С (константы, право чтения кода) —
 в [руководстве аудитора кода](https://github.com/andromanpro/1c-ai-connector-guide).
 
+## О проекте
+
+[ИИкона](https://github.com/andromanpro/1c-ai-connector) — расширение для работы с ИИ в 1С.
+
+<a href="https://infostart.ru/1c/articles/2814180/">
+  <img src="https://infostart.ru/bitrix/templates/sandbox_empty/assets/tpl/abo/img/logo.svg" alt="Инфостарт" width="140">
+</a>
+
+[Обзор ИИконы на Инфостарте](https://infostart.ru/1c/articles/2814180/).
+
 ## Лицензия
 
 [MIT](LICENSE) © 2026 Роман Андриянов ([androman.pro](https://androman.pro))
